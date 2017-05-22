@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -e
+
+kompile lambda.k
+
+for f in t/*.lambda; do
+    echo "$f"
+
+    krun "$f" | diff -u --label actual - \
+                        --label expected "$f.krun"
+done
