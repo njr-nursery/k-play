@@ -4,11 +4,14 @@ set -e
 
 kompile lambda.k
 
+check_output() {
+    local expected="$1"; shift
+    diff -u --label expected "$expected" \
+            --label actual   -
+}
+
 for f in t/*.lambda; do
     echo "$f"
-    kast "$f" > "$f.kast"
-    kast "$f" | diff -u --label actual - \
-                        --label expected "$f.kast"
-    krun "$f" | diff -u --label actual - \
-                        --label expected "$f.krun"
+    kast "$f" | check_output "$f.kast"
+    krun "$f" | check_output "$f.krun"
 done
