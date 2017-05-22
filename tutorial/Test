@@ -6,7 +6,9 @@ kompile lambda.k
 
 for f in t/*.lambda; do
     echo "$f"
-
+    kast "$f" > "$f.kast"
+    kast "$f" | diff -u --label actual - \
+                        --label expected "$f.kast"
     krun "$f" | diff -u --label actual - \
                         --label expected "$f.krun"
 done
