@@ -12,4 +12,13 @@ module LAMBDA
     syntax KResult ::= Val
 
     rule (lambda X:Id . E:Exp) V:Val => E[V / X]
+
+    syntax Val ::= Int
+    syntax Exp ::= IntExp
+    syntax IntExp ::= Int
+    syntax IntExp ::= IntExp "*" IntExp         [strict]
+                    > IntExp "+" IntExp         [strict]
+
+    rule M:Int * N:Int => M *Int N
+    rule M:Int + N:Int => M +Int N
 endmodule
