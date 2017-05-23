@@ -18,6 +18,7 @@ module LAMBDA
     syntax IntExp ::= Int
     syntax IntExp ::= IntExp "*" IntExp         [strict]
                     > IntExp "+" IntExp         [strict]
+                    | "(" IntExp ")"          [bracket]
 
     rule M:Int * N:Int => M *Int N
     rule M:Int + N:Int => M +Int N
