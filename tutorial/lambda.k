@@ -10,15 +10,16 @@ module LAMBDA
                  | "(" Exp ")"          [bracket]
     syntax KVariable ::= Id
     syntax KResult ::= Val
-
+    rule (lambda X:Id . E:Exp) V:Val => E[V / X]
     rule (lambda X:Id . E:Exp) V:Val => E[V / X]
 
-    syntax Val ::= Int
-    syntax Exp ::= IntExp
-    syntax IntExp ::= Int
-    syntax IntExp ::= IntExp "*" IntExp         [strict]
-                    > IntExp "+" IntExp         [strict]
-
-    rule M:Int * N:Int => M *Int N
-    rule M:Int + N:Int => M +Int N
+    syntax Val ::= Int | Bool
+    syntax Exp ::= Exp "*" Exp          [strict, left]
+               | Exp "/" Exp          [strict]
+               > Exp "+" Exp          [strict, left]
+               > Exp "<=" Exp         [strict]
+    rule I1 * I2 => I1 *Int I2
+    rule I1 / I2 => I1 /Int I2  requires I2 =/=Int 0
+    rule I1 + I2 => I1 +Int I2
+    rule I1 <= I2 => I1 <=Int I2
 endmodule
