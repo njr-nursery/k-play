@@ -8,4 +8,8 @@ cd "$BASE"
     echo >&2 'Did not find bats executable. `git submodule update --init`?'
     exit 1
 }
-bats/bin/bats "${@:-t/}"
+tests=( $(find "$@" -name bats          -prune \
+                 -o -name test_helper   -prune \
+                 -o -name .git          -prune \
+                 -o -name '*.bats'      -print) )
+bats/bin/bats "${tests[@]}"
