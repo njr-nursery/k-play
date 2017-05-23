@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 
 set -e
+set -o pipefail
 
 kompile lambda.k
 
 check_output() {
     local expected="$1"; shift
+    echo "$expected"
     diff -u --label expected "$expected" \
             --label actual   -
 }
 
-for f in t/*.lambda; do
-    echo "$f"
-    kast "$f" | check_output "$f.kast"
-    krun "$f" | check_output "$f.krun"
+passed=true
+for f in t/$1*.lambda; do
+    kast "$f" | check_output "$f.kast" || passed=false
+    krun "$f" | check_output "$f.krun" || passed=false
 done
+$passed && echo "PASSED"
