@@ -22,4 +22,8 @@ module LAMBDA
     rule I1 / I2 => I1 /Int I2  requires I2 =/=Int 0
     rule I1 + I2 => I1 +Int I2
     rule I1 <= I2 => I1 <=Int I2
+
+//     syntax Exp ::= "if" Exp "then" Exp "else" Exp   [strict(1)]
+//     rule if true  then E:Exp else _     => E
+//     rule if false then _     else E:Exp => E
 endmodule
