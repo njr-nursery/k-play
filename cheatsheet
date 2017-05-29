@@ -1,9 +1,0 @@
-`[strict]`
-: Force arguments to be evaluated before the current expression
-
-`[bracket]`
-: Parenthesis (only? perhaps it's parameterized) have their usual meaning.
-
-XXX:
-
-* How to kdoc?
