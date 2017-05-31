@@ -15,6 +15,7 @@ module IMP-SYNTAX
     syntax Stmt ::= Id "=" AExp ";"           [strict(2)]
                   | Stmt Stmt
                   | "if" "(" BExp ")" Stmt    [strict(1)]
+                  | "while" "(" BExp ")" Stmt
                   | "{" Stmt "}"
 
     syntax Pgm ::= "int" Ids ";" Stmt
@@ -47,4 +48,6 @@ module IMP
 
     rule if ( true  ) S:Stmt => S
     rule if ( false ) S:Stmt => .
+
+    rule while ( B:BExp  ) S:Stmt => if (B) ( S while (B) S )
 endmodule

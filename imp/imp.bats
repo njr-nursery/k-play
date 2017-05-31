@@ -13,6 +13,15 @@ setup() {
     }
 }
 
+@test "imp while" {
+    run m_krun '
+        int x;
+        while (x <= 12) x = x +1;
+    '
+   assert_success
+   assert_output -p '<state> x |-> 13 </state>'
+}
+
 @test "imp if" {
     run m_krun '
         int x, y;
