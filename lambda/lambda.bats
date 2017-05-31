@@ -2,12 +2,14 @@ load '../t/test-lib'
 
 setup() {
     test_lib_setup
-    kompile "$BATS_TEST_DIRNAME/lambda.k"  -d "$test_scratch_dir"
+    test_suite_scratch="$build_t_dir/$test_suite_name"
+    [[ -e $test_suite_scratch/lambda-kompiled/ ]] ||
+        kompile "$BATS_TEST_DIRNAME/lambda.k"  -d "$test_suite_scratch"
     m_krun() {
         # krun doesn't like process substitution?
         temp="$(mktemp)"
         echo "$1" > "$temp"
-        krun -d "$test_scratch_dir" "$temp"
+        krun -d "$test_suite_scratch" "$temp"
     }
 }
 
