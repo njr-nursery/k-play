@@ -31,10 +31,8 @@ module LAMBDA
     rule let X = E in E':Exp => (lambda X . E') E   [macro]
 
     syntax Exp ::= "letrec" Id Id "=" Exp "in" Exp
-    syntax Id ::= "$x" | "$y"
-    rule letrec F:Id X:Id = E in E'
-        => let F =
-         (lambda $x . ((lambda F . lambda X . E) (lambda $y . ($x $x $y))))
-         (lambda $x . ((lambda F . lambda X . E) (lambda $y . ($x $x $y))))
-       in E'                                        [macro]
+    rule letrec F:Id X:Id = E in E' => let F = mu F . lambda X . E in E' [macro]
+
+    syntax Exp ::= "mu" Id "." Exp [binder, latex(\mu{#1}.{#2})]
+    rule mu X . E => E[(mu X . E) / X]
 endmodule
