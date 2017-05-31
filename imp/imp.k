@@ -2,6 +2,7 @@ module IMP-SYNTAX
     syntax AExp ::= Int | Id
                   | AExp "/" AExp             [left, strict]
                   > AExp "+" AExp             [left, strict]
+                  | AExp "-" AExp             [left, strict]
                   | "(" AExp ")"              [bracket]
 
     syntax BExp ::= Bool
@@ -13,6 +14,8 @@ module IMP-SYNTAX
 
     syntax Stmt ::= Id "=" AExp ";"           [strict(2)]
                   | Stmt Stmt
+                  | "if" "(" BExp ")" Stmt    [strict(1)]
+                  | "{" Stmt "}"
 
     syntax Pgm ::= "int" Ids ";" Stmt
     syntax Ids ::= List{Id, ","}
@@ -24,7 +27,7 @@ module IMP
     syntax KResult ::= Int | Bool
 
     rule M::Int +  N::Int =>  M +Int N
-    rule M::Int /  N::Int =>  M /Int N
+    rule M::Int /  N::Int =>  M /Int N      requires N =/=Int 0
     rule M::Int <= N::Int =>  M <=Int N
     rule M::Int >= N::Int =>  M >=Int N
 
@@ -41,4 +44,7 @@ module IMP
     rule int .Ids; S => S [structural]
     rule S1:Stmt S2:Stmt => S1 ~> S2 [structural]
     rule <k> X:Id => I ...</k> <state>... X |-> I ...</state>
+
+    rule if ( true  ) S:Stmt => S
+    rule if ( false ) S:Stmt => .
 endmodule
