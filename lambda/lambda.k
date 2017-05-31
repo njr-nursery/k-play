@@ -10,11 +10,11 @@ module LAMBDA
                  | "(" Exp ")"          [bracket]
     syntax KVariable ::= Id
     syntax KResult ::= Val
-    rule (lambda X:Id . E:Exp) V:Val => E[V / X]
+
     rule (lambda X:Id . E:Exp) V:Val => E[V / X]
 
     syntax Val ::= Int | Bool
-    syntax Exp ::= Exp "*" Exp          [strict, left]
+    syntax Exp ::= Exp "*" Exp        [strict, left]
                | Exp "/" Exp          [strict]
                > Exp "+" Exp          [strict, left]
                > Exp "<=" Exp         [strict]
@@ -26,4 +26,15 @@ module LAMBDA
     syntax Exp ::= "if" Exp "then" Exp "else" Exp   [strict(1)]
     rule if true  then E:Exp else _     => E
     rule if false then _     else E:Exp => E
+
+    syntax Let ::= "let" Id "=" Exp "in"  Exp
+    rule let X = E in E':Exp => (lambda X . E') E   [macro]
+
+    syntax Exp ::= "letrec" Id Id "=" Exp "in" Exp
+    syntax Id ::= "$x" | "$y"
+    rule letrec F:Id X:Id = E in E'
+        => let F =
+         (lambda $x . ((lambda F . lambda X . E) (lambda $y . ($x $x $y))))
+         (lambda $x . ((lambda F . lambda X . E) (lambda $y . ($x $x $y))))
+       in E'                                        [macro]
 endmodule

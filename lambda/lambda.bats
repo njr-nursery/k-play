@@ -38,3 +38,26 @@ setup() {
         if false then lambda x. 2*x else 4          ⇒ <k> 4 </k>
 .
 }
+
+@test "let" {
+    run m_krun '
+        let f = lambda x . (
+                (lambda t . lambda x . (t t x))
+                (lambda f . lambda x . (if x <= 1 then 1 else (x * (f f (x + -1)))))
+                x
+              )
+        in (f 10)
+'
+    assert_success
+    assert_output '<k> 3628800 </k>'
+}
+
+@test "letrec" {
+    run m_krun '
+        letrec f x = if x <= 1 then 1 else (x * (f (x + -1)))
+        in (f 10)
+'
+    assert_success
+    assert_output '<k> 3628800 </k>'
+}
+
