@@ -27,11 +27,13 @@ module IMP
     imports IMP-SYNTAX
     syntax KResult ::= Int | Bool
 
+    // Int Arithmatic
     rule M::Int +  N::Int =>  M +Int N
     rule M::Int /  N::Int =>  M /Int N      requires N =/=Int 0
     rule M::Int <= N::Int =>  M <=Int N
     rule M::Int >= N::Int =>  M >=Int N
 
+    // Boolean Arithmatic
     rule true && B => B
     rule false && _ => false
 
@@ -39,15 +41,20 @@ module IMP
                     <k> $PGM:Pgm </k>
                     <state> .Map </state>
                   </T>
-    rule <k> int (X,Xs => Xs) ; _ </k> <state> Rho:Map (.Map => X|->0)</state>
-        requires notBool (X in keys(Rho))
-    rule <k> X = I:Int; => . ... </k> <state> ... X |-> (_ => I) ...</state>
-    rule int .Ids; S => S [structural]
-    rule S1:Stmt S2:Stmt => S1 ~> S2 [structural]
-    rule <k> X:Id => I ...</k> <state>... X |-> I ...</state>
 
+    // Control structures
     rule if ( true  ) S:Stmt => S
     rule if ( false ) S:Stmt => .
-
     rule while ( B:BExp  ) S:Stmt => if (B) ( S while (B) S )
+
+    // Variable declaration, assignment and substitution
+    rule <k> int (X,Xs => Xs) ; _ </k> <state> Rho:Map (.Map => X|->0)</state>
+        requires notBool (X in keys(Rho))
+    rule int .Ids; S     => S       [structural]
+    rule <k> X = I:Int;  => . ... </k> <state> ... X |-> (_ => I) ...</state>
+    rule <k> X:Id        =>  I ...</k> <state> ... X |-> I ... </state>
+
+    // Sequencing
+    rule S1:Stmt S2:Stmt => S1 ~> S2    [structural]
+
 endmodule
