@@ -98,8 +98,7 @@ assert_test_home() {
 
 assert_function() {
     [ -n "$1" ] || fail "assert_function: missing function name"
-    local fut="$1"; shift   # function under test
-    [ -z "$1" ] || fail "assert_function: too many parameters"
+    local cut=("$@");
 
     local failures=0
 
@@ -112,11 +111,11 @@ assert_function() {
             < <(echo "$param_spec∙" | sed -e 's/ *∙ */∙/g' -e 's/ *$//')
         IFS="$oldifs"
 
-        local actual="$($fut "${params[@]}" < /dev/null)"
+        local actual="$("${cut[@]}" "${params[@]}" < /dev/null)"
         [ "$expected" = "$actual" ] || {
             failures=$(($failures+1))
             [ $failures -eq 1 ] \
-                && echo >&2 "-- assert_function '$fut' failure(s) --"
+                && echo >&2 "-- assert_function '${cut[@]}' failure(s) --"
             echo >&2 "spec   : $spec"
             echo >&2 "actual : $actual"
         }

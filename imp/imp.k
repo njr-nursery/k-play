@@ -1,16 +1,7 @@
-module IMP-SYNTAX
-    syntax AExp ::= Int | Id
-                  | AExp "/" AExp             [left, strict]
-                  > AExp "+" AExp             [left, strict]
-                  | AExp "-" AExp             [left, strict]
-                  | "(" AExp ")"              [bracket]
+require "exp.k"
 
-    syntax BExp ::= Bool
-                  | AExp "<=" AExp            [seqstrict, latex({#1}\le{#2})]
-                  | AExp ">=" AExp            [seqstrict, latex({#1}\ge{#2})]
-                  | "!" BExp                  [strict]
-                  > BExp "&&" BExp            [left, strict(1)]
-                  | "(" BExp ")"              [bracket]
+module IMP-SYNTAX
+    imports EXP-SYNTAX
 
     syntax Stmt ::= Id "=" AExp ";"           [strict(2)]
                   | Stmt Stmt
@@ -22,20 +13,11 @@ module IMP-SYNTAX
     syntax Ids ::= List{Id, ","}
 endmodule
 
-
 module IMP
     imports IMP-SYNTAX
+    imports EXP
+
     syntax KResult ::= Int | Bool
-
-    // Int Arithmatic
-    rule M::Int +  N::Int =>  M +Int N
-    rule M::Int /  N::Int =>  M /Int N      requires N =/=Int 0
-    rule M::Int <= N::Int =>  M <=Int N
-    rule M::Int >= N::Int =>  M >=Int N
-
-    // Boolean Arithmatic
-    rule true && B => B
-    rule false && _ => false
 
     configuration <T>
                     <k> $PGM:Pgm </k>
@@ -56,5 +38,4 @@ module IMP
 
     // Sequencing
     rule S1:Stmt S2:Stmt => S1 ~> S2    [structural]
-
 endmodule
