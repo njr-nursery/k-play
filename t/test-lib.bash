@@ -20,6 +20,7 @@ test_lib_setup() {
     }
 
     test_home="$test_scratch_dir/home"
+    test_suite_scratch="$build_t_dir/$test_suite_name"
 }
 
 # A specification may have leading spaces, trailing spaces, blank
@@ -125,4 +126,23 @@ assert_function() {
         echo >&2 '--'
         fail "$failures specifications failed"
     }
+}
+
+## K Framework helpers ###############################################
+
+m_kompile() {
+    lang="$1"; shift
+    [[ -e $test_suite_scratch/$lang/$lang-kompiled/ ]] || {
+        kompile -d "$test_suite_scratch/$lang" "$BATS_TEST_DIRNAME/$lang.k"
+    }
+}
+
+m_krun() {
+    lang="$1"; shift
+    input="$1"; shift
+    m_kompile "$lang"
+    # krun doesn't like process substitution?
+    temp="$(mktemp)"
+    echo "$input" > "$temp"
+    krun -d "$test_suite_scratch/$lang" "$temp"
 }

@@ -2,24 +2,6 @@ load '../t/test-lib'
 
 setup() {
     test_lib_setup
-    test_suite_scratch="$build_t_dir/$test_suite_name"
-
-    compile() {
-        lang="$1"; shift
-        [[ -e $test_suite_scratch/$lang/$lang-kompiled/ ]] || {
-            kompile -d "$test_suite_scratch/$lang" "$BATS_TEST_DIRNAME/$lang.k"
-        }
-    }
-
-    m_krun() {
-        lang="$1"; shift
-        input="$1"; shift
-        compile "$lang"
-        # krun doesn't like process substitution?
-        temp="$(mktemp)"
-        echo "$input" > "$temp"
-        krun -d "$test_suite_scratch/$lang" "$temp"
-    }
 }
 
 @test "imp while" {
