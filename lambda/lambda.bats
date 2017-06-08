@@ -54,4 +54,3 @@ load '../t/test-lib'
     assert_success
     assert_output '<k> 3628800 </k>'
 }
-
