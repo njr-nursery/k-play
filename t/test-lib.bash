@@ -66,6 +66,7 @@ create_test_home() {
             echo "Content of $path" > "$abs_path"
         fi
     done < <(trim_spec)
+
 }
 
 run_setup_on_test_home() {
@@ -130,6 +131,8 @@ assert_function() {
 
 ## K Framework helpers ###############################################
 
+set -o pipefail
+
 m_kompile() {
     lang="$1"; shift
     [[ -e $test_suite_scratch/$lang/$lang-kompiled/ ]] || {
@@ -139,10 +142,13 @@ m_kompile() {
 
 m_krun() {
     lang="$1"; shift
+    cell="$1"; shift
     input="$1"; shift
     m_kompile "$lang"
     # krun doesn't like process substitution?
     temp="$(mktemp)"
     echo "$input" > "$temp"
-    krun -d "$test_suite_scratch/$lang" "$temp"
+    krun -d "$test_suite_scratch/$lang" "$temp" \
+        | sed -n "s/.*<$cell>\(.*\)<\/$cell>.*/\1/p" \
+        | sed -e 's/^ *//'  -e 's/ *$//'
 }
