@@ -1,5 +1,12 @@
 load '../t/test-lib'
 
+@test "lambda callcc" {
+    assert_function m_krun lambda <<.
+        (callcc (lambda k  . ((k 5) + 2))) + 10     ⇒ <k> 15 </k>
+        (callcc (lambda k  . (5 + 2)))     + 10     ⇒ <k> 17 </k>
+.
+}
+
 @test "lambda basic" {
     assert_function m_krun lambda <<.
         lambda x . x                                ⇒ <k> lambda x . x </k>

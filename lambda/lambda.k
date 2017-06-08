@@ -35,4 +35,9 @@ module LAMBDA
 
     syntax Exp ::= "mu" Id "." Exp [binder, latex(\mu{#1}.{#2})]
     rule mu X . E => E[(mu X . E) / X]
+
+    syntax Exp ::= "callcc" Exp [strict]
+    syntax Val ::= cc(K)
+    rule <k> (callcc V:Val => V cc(K)) ~> K </k>
+    rule <k> cc(K) V ~> _ => V ~> K </k>
 endmodule
