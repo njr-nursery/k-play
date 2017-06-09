@@ -1,17 +1,9 @@
 load '../t/test-lib'
 
-@test "lambda callcc" {
-    assert_function m_krun lambda k <<.
-        (callcc (lambda k  . ((k 5) + 2))) + 10     ⇒ 15
-        (callcc (lambda k  . (5 + 2)))     + 10     ⇒ 17
-.
-}
-
 @test "lambda basic" {
     assert_function m_krun lambda k <<.
-        lambda x . x                                ⇒ lambda x . x
-        a (((lambda x.lambda y.x) y) z)             ⇒ a y
-        (lambda z.(z z)) (lambda x.lambda y.(x y))  ⇒ lambda y . ( ( lambda x . lambda y . ( x y ) ) y )
+        (lambda x . x) 99                            ⇒ 99
+        (lambda x . x) (((lambda x.lambda y.x) 3) 2) ⇒ 3
 .
 }
 
@@ -33,14 +25,24 @@ load '../t/test-lib'
 .
 }
 
+@test "lambda simple let" {
+    run m_krun lambda k '
+    let double = lambda x . (2 * x)
+    in (double (double 5))
+'
+    assert_success
+    assert_output '20'
+}
+
+
 @test "let" {
     run m_krun lambda k '
-        let f = lambda x . (
-                (lambda t . lambda x . (t t x))
-                (lambda f . lambda x . (if x <= 1 then 1 else (x * (f f (x + -1)))))
-                x
-              )
-        in (f 10)
+    let f = lambda x . (
+            (lambda t . lambda x . (t t x))
+            (lambda f . lambda x . (if x <= 1 then 1 else (x * (f f (x + -1)))))
+            x
+          )
+    in (f 10)
 '
     assert_success
     assert_output '3628800'
@@ -54,3 +56,11 @@ load '../t/test-lib'
     assert_success
     assert_output '3628800'
 }
+
+@test "lambda callcc" {
+    assert_function m_krun lambda k <<.
+        (callcc (lambda k  . ((k 5) + 2))) + 10     ⇒ 15
+        (callcc (lambda k  . (5 + 2)))     + 10     ⇒ 17
+.
+}
+

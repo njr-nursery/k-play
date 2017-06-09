@@ -1,9 +1,6 @@
-require "substitution.k"
-
 module LAMBDA-SYNTAX
-    syntax Val ::= Id
+    syntax Exp ::= Val | Id
                  | "lambda" Id "." Exp  [binder, latex(\lambda{#1}.{#2})]
-    syntax Exp ::= Val
                  | Exp Exp              [left, strict]
                  | "(" Exp ")"          [bracket]
 
@@ -18,7 +15,7 @@ module LAMBDA-SYNTAX
 
     syntax Exp ::= "if" Exp "then" Exp "else" Exp   [strict(1)]
 
-    syntax Let ::= "let" Id "=" Exp "in"  Exp
+    syntax Exp ::= "let" Id "=" Exp "in"  Exp
     syntax Exp ::= "letrec" Id Id "=" Exp "in" Exp
     syntax Exp ::= "mu" Id "." Exp [binder, latex(\mu{#1}.{#2})]
     syntax Exp ::= "callcc" Exp [strict]
@@ -26,9 +23,25 @@ endmodule
 
 module LAMBDA
     imports LAMBDA-SYNTAX
-    imports SUBSTITUTION
 
-    rule (lambda X:Id . E:Exp) V:Val => E[V / X]
+    syntax Val ::= closure(Map,Id,Exp)
+    rule <k> lambda X:Id . E => closure(Rho,X,E) ... </k>
+         <env> Rho </env> [structural]
+    rule <k> closure(Rho,X,E) V:Val => E ~>  Rho' ... </k>
+         <env>  Rho' => Rho[X <- !N] </env>
+         <store> ... .Map => (!N:Int |-> V) ... </store>
+    rule <k> X => V ... </k>
+         <env>   ... X |-> N ... </env>
+         <store> ... N |-> V ... </store>
+    rule <k> _:Val ~>  (Rho' => .) ... </k>
+         <env>  _ => Rho' </env>
+
+    rule <k> closure(Rho,X,E) V:Val => E ~> Rho' ...</k>
+       <env> Rho' => Rho[X <- !N] </env>
+       <store>... .Map => (!N:Int |-> V) ...</store>
+    rule <k> X => V ...</k>
+       <env>... X |-> N ...</env>
+       <store>... N |-> V ...</store>
 
     rule I1 * I2 => I1 *Int I2
     rule I1 / I2 => I1 /Int I2  requires I2 =/=Int 0
@@ -39,10 +52,21 @@ module LAMBDA
     rule if false then _     else E:Exp => E
 
     rule let X = E in E':Exp => (lambda X . E') E   [macro]
-    rule letrec F:Id X:Id = E in E' => let F = mu F . lambda X . E in E' [macro]
-    rule mu X . E => E[(mu X . E) / X]
+
+    syntax Id ::= "$x" | "$y"
+    rule letrec F:Id X:Id = E in E' => let F =
+         (lambda $x . ((lambda F . lambda X . E) (lambda $y . ($x $x $y))))
+         (lambda $x . ((lambda F . lambda X . E) (lambda $y . ($x $x $y))))
+       in E'                                                           [macro]
+
+//    rule mu X . E => E[(mu X . E) / X]
 
     syntax Val ::= cc(K)
     rule <k> (callcc V:Val => V cc(K)) ~> K </k>
     rule <k> cc(K) V ~> _ => V ~> K </k>
+
+    configuration <t><k> $PGM:Exp </k>
+                     <env> .Map </env>
+                     <store> .Map </store>
+                  </t>
 endmodule
