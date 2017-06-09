@@ -61,9 +61,9 @@ module LAMBDA
 
 //    rule mu X . E => E[(mu X . E) / X]
 
-    syntax Val ::= cc(K)
-    rule <k> (callcc V:Val => V cc(K)) ~> K </k>
-    rule <k> cc(K) V ~> _ => V ~> K </k>
+    syntax Val ::= cc(Map,K)
+    rule <k> (callcc L:Val => L cc(Rho,K)) ~> K </k> <env> Rho </env>
+    rule <k> cc(Rho,K) V ~> _ => V ~> K </k> <env> _ => Rho </env>
 
     configuration <t><k> $PGM:Exp </k>
                      <env> .Map </env>

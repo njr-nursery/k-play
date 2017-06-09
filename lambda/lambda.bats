@@ -34,7 +34,6 @@ load '../t/test-lib'
     assert_output '20'
 }
 
-
 @test "let" {
     run m_krun lambda k '
     let f = lambda x . (
@@ -59,8 +58,9 @@ load '../t/test-lib'
 
 @test "lambda callcc" {
     assert_function m_krun lambda k <<.
-        (callcc (lambda k  . ((k 5) + 2))) + 10     ⇒ 15
-        (callcc (lambda k  . (5 + 2)))     + 10     ⇒ 17
+        (callcc (lambda k  . ((k 5) + 2))) + 10                     ⇒ 15
+        (callcc (lambda k  . (5 + 2)))     + 10                     ⇒ 17
+        let x = 1 in ((callcc lambda k . (let x = 2 in (k x))) + x) ⇒ 3
 .
 }
 
